@@ -762,7 +762,7 @@ export default function App() {
         </div>
 
         {/* RIGHT COLUMN: WORKSPACE PAPER PREVIEW (with scale/zoom) */}
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex-1 flex flex-col gap-4 no-print">
           
           {/* Top Panel Controls */}
           <div className="no-print bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">

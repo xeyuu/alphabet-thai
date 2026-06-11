@@ -41,7 +41,7 @@
   
   html, body {
     width: 210mm !important;
-    height: 297mm !important;
+    height: auto !important;
     background: #ffffff !important;
     margin: 0 !important;
     padding: 0 !important;
