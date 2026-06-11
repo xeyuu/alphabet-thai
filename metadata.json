@@ -1,0 +1,6 @@
+{
+  "name": "สร้างใบงานพยัญชนะไทย A4",
+  "description": "เว็บแอปพลิเคชันสำหรับสร้างและออกแบบใบงานฝึกเขียน-ฝึกอ่านพยัญชนะไทยทั้ง 44 ตัว จัดพิมพ์ง่ายบนกระดาษ A4 พร้อมปุ่มดาวน์โหลดไฟล์ PDF",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
