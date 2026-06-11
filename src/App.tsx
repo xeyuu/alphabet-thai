@@ -219,6 +219,34 @@ export default function App() {
 
   const activeFontClass = FONT_CLASSES[selectedFont as "itim" | "mali" | "pridi" | "sarabun"] || "font-itim";
 
+  // Helper to render high quality vector cartoon illustration using Twemoji CDN with text/emoji fallback
+  const renderCuteIllustration = (emoji: string, sizeClass: string, altText: string) => {
+    const codePoints = Array.from(emoji)
+      .map(char => char.codePointAt(0)!.toString(16))
+      .filter(hex => hex !== "fe0f");
+    const hex = codePoints.join("-");
+    const url = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${hex}.svg`;
+
+    return (
+      <div className={`relative flex items-center justify-center ${sizeClass}`}>
+        <img 
+          src={url} 
+          alt={altText} 
+          className="w-full h-full object-contain select-none"
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+            if (fallback) fallback.style.display = 'block';
+          }}
+        />
+        <span className="hidden select-none font-sans text-center leading-none" style={{ fontSize: 'inherit' }}>
+          {emoji}
+        </span>
+      </div>
+    );
+  };
+
   // List of Thai Consonants classified by Traditional Consonant Classes (Triclass - ไตรยางศ์)
   // High: ข ฃ ฉ ฐ ถ ผ ฝ ศ ษ ส ห
   // Mid: ก จ ฎ ฏ ด ต บ ป อ
@@ -873,10 +901,10 @@ export default function App() {
                                 <div className="flex flex-col items-center select-none font-bold">
                                   <span className={`${activeFontClass} leading-none ${
                                     selectedLayout === "2" 
-                                      ? "text-[120px] mb-2" 
+                                      ? "text-[180px] mb-2" 
                                       : selectedLayout === "3" 
-                                      ? "text-[90px] mb-1" 
-                                      : "text-[75px]"
+                                      ? "text-[135px] mb-1" 
+                                      : "text-[105px]"
                                   }`}>
                                     {consonant.character}
                                   </span>
@@ -923,9 +951,14 @@ export default function App() {
                                 <div className={`flex flex-col items-center justify-center p-2 bg-slate-50/50 rounded-xl border border-dashed select-none relative ${activeTheme.border} ${
                                   selectedLayout === "2" ? "w-28 h-28 text-6xl" : selectedLayout === "3" ? "w-22 h-22 text-5xl" : "hidden"
                                 }`}>
-                                  <span className="relative z-10 transition-transform active:scale-125 select-none">{consonant.emoji}</span>
+                                  <div className="relative z-10 transition-transform active:scale-125 select-none">
+                                    {renderCuteIllustration(
+                                      consonant.emoji,
+                                      selectedLayout === "2" ? "w-14 h-14 animate-pulse" : "w-10 h-10 animate-pulse",
+                                      consonant.name
+                                    )}
+                                  </div>
                                   <span className="text-xs font-bold text-slate-500 block mt-1">{consonant.name}</span>
-                                  <span className="absolute -top-1.5 -right-1.5 text-[10px] text-pink-500">🌸</span>
                                 </div>
 
                                 {/* Dash Guidelines Tracing Rows */}
@@ -987,10 +1020,10 @@ export default function App() {
                                 <span 
                                   className={`${activeFontClass} font-extrabold text-transparent leading-none z-10 select-none ${
                                     selectedLayout === "2" 
-                                      ? "text-[140px]" 
+                                      ? "text-[210px]" 
                                       : selectedLayout === "3" 
-                                      ? "text-[100px]" 
-                                      : "text-[85px]"
+                                      ? "text-[150px]" 
+                                      : "text-[120px]"
                                   }`}
                                   style={{ 
                                     WebkitTextStroke: "3px #0f172a",
@@ -1010,14 +1043,16 @@ export default function App() {
                                 <div className="flex justify-between items-center select-none">
                                   <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
                                     <span>ระบายสี {consonant.name}</span>
-                                    <span className="text-base">{consonant.emoji}</span>
+                                    {renderCuteIllustration(consonant.emoji, "w-5 h-5", consonant.name)}
                                   </span>
                                   <span className="text-[10px] text-slate-400">{consonant.fullname}</span>
                                 </div>
                                 
                                 {/* Large blank frame with dashed edge for children to sketch drawing */}
                                 <div className="border-2 border-dashed border-slate-300 rounded-xl flex-1 min-h-[70px] bg-slate-50/50 flex flex-col items-center justify-center p-3 text-center select-none relative overflow-hidden">
-                                  <span className="text-4xl opacity-15">{consonant.emoji}</span>
+                                  <div className="opacity-15">
+                                    {renderCuteIllustration(consonant.emoji, "w-14 h-14", consonant.name)}
+                                  </div>
                                   <span className="text-[9px] text-slate-400 font-bold mt-1 block group">
                                     ฝึกวาดรูปหรือระบายสี '{consonant.name}' ตรงนี้ 🎨
                                   </span>
@@ -1051,12 +1086,6 @@ export default function App() {
                                 <div className="absolute bottom-12 right-6 w-16 h-16 bg-pink-100 rounded-full opacity-20 filter blur-xs" />
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-sky-100 rounded-full opacity-10 filter blur-sm" />
                                 
-                                {/* Cute Scissor Label on Boundary (Only in web preview, keeps print tidy) */}
-                                <div className="absolute top-1 right-2 flex items-center gap-1 opacity-65 text-slate-400 text-[9px] font-sans pointer-events-none">
-                                  <Scissors className="w-2.5 h-2.5 text-pink-500" />
-                                  <span>สายตัดการ์ด ✂️</span>
-                                </div>
-                                
                                 {/* Card Header Block */}
                                 <div className="flex items-center justify-between z-10 select-none pb-1.5 border-b border-dashed border-slate-200">
                                   <div className="flex items-center gap-1.5">
@@ -1086,13 +1115,15 @@ export default function App() {
                                     <div className="relative group">
                                       {/* Playful drop background bubble */}
                                       <div className={`absolute -inset-1.5 bg-${themeColor === 'mono' ? 'slate-100' : themeColor + '-100'} bg-opacity-70 rounded-2xl opacity-75 blur-xs transition-all duration-300 group-hover:opacity-100`} />
-                                      <div className="relative bg-white border border-slate-200 shadow-2xs rounded-2xl px-5 py-2 flex flex-col items-center justify-center min-w-[95px]">
+                                      <div className={`relative bg-white border border-slate-200 shadow-2xs rounded-2xl px-5 py-2 flex flex-col items-center justify-center ${
+                                        isLayout2 ? "min-w-[195px] px-6 py-3" : isLayout3 ? "min-w-[155px]" : "min-w-[115px]"
+                                      }`}>
                                         <span className={`${activeFontClass} font-black tracking-tight leading-none text-slate-900 ${
                                           isLayout2 
-                                            ? "text-[120px]" 
+                                            ? "text-[210px]" 
                                             : isLayout3 
-                                            ? "text-[95px]" 
-                                            : "text-[75px]"
+                                            ? "text-[160px]" 
+                                            : "text-[115px]"
                                         }`}>
                                           {consonant.character}
                                         </span>
@@ -1105,14 +1136,16 @@ export default function App() {
 
                                   {/* Right: Adorable cartoon animal badge */}
                                   <div className="flex flex-col items-center">
-                                    <div className={`relative flex items-center justify-center rounded-3xl border-3 border-dotted shadow-sm transition hover:scale-105 ${cardTheme.border} ${cardTheme.illustBg} ${
+                                    <div className={`relative flex items-center justify-center transition hover:scale-105 ${
                                       isLayout2 ? "w-28 h-28 text-6xl" : isLayout3 ? "w-22 h-22 text-5xl" : "w-18 h-18 text-4xl"
                                     }`}>
-                                      {/* Cute cartoon floaters */}
-                                      <span className="absolute -top-1 -right-1 text-xs select-none">✨</span>
-                                      <span className="absolute -bottom-1 -left-1 text-xs select-none animate-bounce">🎈</span>
-                                      
-                                      <span className="select-none filter drop-shadow-md">{consonant.emoji}</span>
+                                      <div className="filter drop-shadow-md">
+                                        {renderCuteIllustration(
+                                          consonant.emoji,
+                                          isLayout2 ? "w-28 h-28 animate-pulse" : isLayout3 ? "w-22 h-22 animate-pulse" : "w-18 h-18 animate-pulse",
+                                          consonant.name
+                                        )}
+                                      </div>
                                     </div>
                                     
                                     {/* Traditional mnemonic sub banner */}
@@ -1220,7 +1253,7 @@ export default function App() {
                       <div className={`flex items-center gap-4 ${selectedLayout === "4" ? "w-full justify-between" : ""}`}>
                         <div className="flex flex-col items-center">
                           <span className={`${activeFontClass} font-bold text-slate-900 leading-none ${
-                            selectedLayout === "2" ? "text-[120px] mb-2" : selectedLayout === "3" ? "text-[90px] mb-1" : "text-[75px]"
+                            selectedLayout === "2" ? "text-[180px] mb-2" : selectedLayout === "3" ? "text-[135px] mb-1" : "text-[105px]"
                           }`}>
                             {consonant.character}
                           </span>
@@ -1256,7 +1289,13 @@ export default function App() {
                         <div className={`flex flex-col items-center justify-center p-2 bg-slate-50 rounded-xl border border-dashed relative ${activeTheme.border} ${
                           selectedLayout === "2" ? "w-28 h-28 text-6xl" : selectedLayout === "3" ? "w-22 h-22 text-5xl" : "hidden"
                         }`}>
-                          <span className="relative z-10">{consonant.emoji}</span>
+                          <div className="relative z-10 select-none">
+                            {renderCuteIllustration(
+                              consonant.emoji,
+                              selectedLayout === "2" ? "w-14 h-14" : "w-10 h-10",
+                              consonant.name
+                            )}
+                          </div>
                           <span className="text-xs font-bold text-slate-500 block mt-1">{consonant.name}</span>
                         </div>
 
@@ -1306,7 +1345,7 @@ export default function App() {
                         </span>
                         <span 
                           className={`${activeFontClass} font-extrabold text-transparent leading-none z-10 ${
-                            selectedLayout === "2" ? "text-[140px]" : selectedLayout === "3" ? "text-[100px]" : "text-[85px]"
+                            selectedLayout === "2" ? "text-[210px]" : selectedLayout === "3" ? "text-[150px]" : "text-[120px]"
                           }`}
                           style={{ WebkitTextStroke: "3px #0f172a" }}
                         >
@@ -1321,13 +1360,15 @@ export default function App() {
                         <div className="flex justify-between items-center">
                           <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
                             <span>ระบายสี {consonant.name}</span>
-                            <span className="text-base">{consonant.emoji}</span>
+                            {renderCuteIllustration(consonant.emoji, "w-5 h-5", consonant.name)}
                           </span>
                           <span className="text-[10px] text-slate-400">{consonant.fullname}</span>
                         </div>
                         
                         <div className="border-2 border-dashed border-slate-300 rounded-xl flex-1 min-h-[70px] bg-slate-50 flex flex-col items-center justify-center p-3 text-center relative overflow-hidden">
-                          <span className="text-4xl opacity-15">{consonant.emoji}</span>
+                          <div className="opacity-15">
+                            {renderCuteIllustration(consonant.emoji, "w-14 h-14", consonant.name)}
+                          </div>
                           <span className="text-[9px] text-slate-400 font-bold mt-1 block">
                             ฝึกวาดรูปหรือระบายสี '{consonant.name}' ตรงนี้ 🎨
                           </span>
@@ -1359,12 +1400,6 @@ export default function App() {
                         <div className="absolute bottom-12 right-6 w-16 h-16 bg-pink-105 rounded-full opacity-20 filter blur-xs" />
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-sky-105 rounded-full opacity-10 filter blur-sm" />
                         
-                        {/* Cute Scissor Label on Boundary (Only in web preview, keeps print tidy) */}
-                        <div className="absolute top-1 right-2 flex items-center gap-1 opacity-60 text-slate-400 text-[9px] font-sans pointer-events-none">
-                          <Scissors className="w-2.5 h-2.5 text-pink-500" />
-                          <span>สายตัดการ์ด ✂️</span>
-                        </div>
-                        
                         {/* Card Header Block */}
                         <div className="flex items-center justify-between z-10 pb-1.5 border-b border-dashed border-slate-200/80">
                           <div className="flex items-center gap-1.5">
@@ -1394,13 +1429,15 @@ export default function App() {
                             <div className="relative group">
                               {/* Playful drop background bubble */}
                               <div className={`absolute -inset-1.5 bg-${themeColor === 'mono' ? 'slate-100' : themeColor + '-100'} bg-opacity-70 rounded-2xl opacity-75 blur-xs transition-all duration-300 group-hover:opacity-100`} />
-                              <div className="relative bg-white border border-slate-200/80 shadow-2xs rounded-2xl px-5 py-2 flex flex-col items-center justify-center min-w-[95px]">
+                              <div className={`relative bg-white border border-slate-200/80 shadow-2xs rounded-2xl px-5 py-2 flex flex-col items-center justify-center ${
+                                isLayout2 ? "min-w-[195px] px-6 py-3" : isLayout3 ? "min-w-[155px]" : "min-w-[115px]"
+                              }`}>
                                 <span className={`${activeFontClass} font-black tracking-tight leading-none text-slate-900 ${
                                   isLayout2 
-                                    ? "text-[120px]" 
+                                    ? "text-[210px]" 
                                     : isLayout3
-                                    ? "text-[95px]" 
-                                    : "text-[75px]"
+                                    ? "text-[160px]" 
+                                    : "text-[115px]"
                                 }`}>
                                   {consonant.character}
                                 </span>
@@ -1413,14 +1450,16 @@ export default function App() {
 
                           {/* Right: Adorable cartoon animal badge */}
                           <div className="flex flex-col items-center">
-                            <div className={`relative flex items-center justify-center rounded-3xl border-3 border-dotted shadow-sm transition hover:scale-105 ${cardTheme.border} ${cardTheme.illustBg} ${
+                            <div className={`relative flex items-center justify-center transition hover:scale-105 ${
                               isLayout2 ? "w-28 h-28 text-6xl" : isLayout3 ? "w-22 h-22 text-5xl" : "w-18 h-18 text-4xl"
                             }`}>
-                              {/* Cute cartoon floaters */}
-                              <span className="absolute -top-1 -right-1 text-xs">✨</span>
-                              <span className="absolute -bottom-1 -left-1 text-xs animate-bounce">🎈</span>
-                              
-                              <span className="filter drop-shadow-md">{consonant.emoji}</span>
+                              <div className="filter drop-shadow-md">
+                                {renderCuteIllustration(
+                                  consonant.emoji,
+                                  isLayout2 ? "w-28 h-28" : isLayout3 ? "w-22 h-22" : "w-18 h-18",
+                                  consonant.name
+                                )}
+                              </div>
                             </div>
                             
                             {/* Traditional mnemonic sub banner */}
