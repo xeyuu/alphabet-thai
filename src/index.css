@@ -1,12 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Itim&family=Mitr:wght@400;500;700&family=Sarabun:ital,wght@0,400;0,500;0,700;1,400&family=Sriracha&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Itim&family=Sarabun:ital,wght@0,400;0,500;0,700;1,400&family=Mali:wght@400;500;600;700&family=Pridi:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", "Sarabun", sans-serif;
   --font-itim: "Itim", cursive;
-  --font-mitr: "Mitr", sans-serif;
-  --font-sriracha: "Sriracha", cursive;
+  --font-mali: "Mali", cursive;
+  --font-pridi: "Pridi", serif;
   --font-sarabun: "Sarabun", sans-serif;
+  --font-mitr: "Sarabun", sans-serif;
+  --font-sriracha: "Mali", cursive;
   
   --animate-fade-in-up: fade-in-up 0.4s ease-out;
 }
@@ -71,6 +73,10 @@
     justify-content: space-between !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+
+  .print-page:last-child {
+    page-break-after: avoid !important;
   }
 }
 

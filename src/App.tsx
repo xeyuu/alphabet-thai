@@ -37,13 +37,12 @@ export default function App() {
   // --- States ---
   const [selectedLayout, setSelectedLayout] = useState<"2" | "3" | "4">("3"); // Consonants per page
   const [worksheetStyle, setWorksheetStyle] = useState<"reading" | "coloring" | "flashcard">("reading");
-  const [selectedFont, setSelectedFont] = useState<"itim" | "sriracha" | "mitr" | "sarabun">("itim");
+  const [selectedFont, setSelectedFont] = useState<"itim" | "mali" | "pridi" | "sarabun">("itim");
   const [themeColor, setThemeColor] = useState<"pink" | "blue" | "green" | "yellow" | "purple" | "mono">("pink");
   const [headerText, setHeaderText] = useState("ใบงานฝึกอ่านและคัดลายมือภาษาไทย (ชั้นประถมศึกษาปีที่ 1)");
   const [studentNameTemplate, setStudentNameTemplate] = useState("ชื่อ: .............................................................. ชั้น: ............. เลขที่: ............");
   
   // Customization Toggles
-  const [showEnglishPhonetics, setShowEnglishPhonetics] = useState(true);
   const [showTraditionalPhrases, setShowTraditionalPhrases] = useState(true);
   const [showTracingGuides, setShowTracingGuides] = useState(true);
   const [guidelineRows, setGuidelineRows] = useState(3); // lines of dotted guide box
@@ -213,12 +212,12 @@ export default function App() {
   // Font class mapping representing imported fonts
   const FONT_CLASSES = {
     itim: "font-itim",
-    sriracha: "font-sriracha",
-    mitr: "font-mitr",
+    mali: "font-mali",
+    pridi: "font-pridi",
     sarabun: "font-sarabun"
   };
 
-  const activeFontClass = FONT_CLASSES[selectedFont];
+  const activeFontClass = FONT_CLASSES[selectedFont as "itim" | "mali" | "pridi" | "sarabun"] || "font-itim";
 
   // List of Thai Consonants classified by Traditional Consonant Classes (Triclass - ไตรยางศ์)
   // High: ข ฃ ฉ ฐ ถ ผ ฝ ศ ษ ส ห
@@ -395,7 +394,7 @@ export default function App() {
       </header>
 
       {/* BODY CONTENT MAP */}
-      <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 md:p-6 gap-6">
+      <div className="no-print flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 md:p-6 gap-6">
         
         {/* LEFT COLUMN: EDITING CONTROL DASHBOARD (no-print) */}
         <div className="no-print lg:w-[380px] w-full flex flex-col gap-6 bg-slate-100 shrink-0">
@@ -467,10 +466,10 @@ export default function App() {
               </div>
               <div className="grid grid-cols-2 gap-1.5">
                 {[
-                  { key: "itim", label: "Itim (น่ารัก)", font: "font-itim" },
-                  { key: "sriracha", label: "Sriracha (เขียนง่าย)", font: "font-sriracha" },
-                  { key: "mitr", label: "Mitr (อ่านง่าย)", font: "font-mitr" },
-                  { key: "sarabun", label: "Sarabun (ราชการ)", font: "font-sarabun" },
+                  { key: "itim", label: "Itim (ตัวมนน่ารัก)", font: "font-itim" },
+                  { key: "mali", label: "Mali (เขียนมืออักษรมน)", font: "font-mali" },
+                  { key: "pridi", label: "Pridi (มีหัวกลม อ่านง่ายมาก)", font: "font-pridi" },
+                  { key: "sarabun", label: "Sarabun (มาตรฐาน ป.1)", font: "font-sarabun" },
                 ].map((font) => (
                   <button
                     key={font.key}
@@ -552,15 +551,6 @@ export default function App() {
 
             {/* Custom Checkboxes options */}
             <div className="flex flex-col gap-3 pt-1">
-              <label className="flex items-center gap-2 text-xs text-slate-700 font-medium cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showEnglishPhonetics}
-                  onChange={(e) => setShowEnglishPhonetics(e.target.checked)}
-                  className="rounded text-pink-500 focus:ring-pink-300 w-4 h-4 accent-pink-500"
-                />
-                <span>แสดงแปลภาษาอังกฤษและการอ่านโรมัน (English)</span>
-              </label>
 
               <label className="flex items-center gap-2 text-xs text-slate-700 font-medium cursor-pointer">
                 <input
@@ -842,11 +832,9 @@ export default function App() {
                     {/* Page Header (Teacher customize-able) */}
                     <div className="w-full flex justify-between items-start border-b-2 border-slate-300 pb-2 mb-2 select-none">
                       <div className="flex-1">
-                        <h4 className="text-sm font-bold text-slate-800 font-mitr leading-tight">{headerText}</h4>
+                        <h4 className="text-sm font-bold text-slate-800 leading-tight">{headerText}</h4>
                         <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-2">
                           <span className="font-semibold text-pink-600 bg-pink-100/50 px-1.5 py-0.2 rounded">วิชาภาษาไทย</span>
-                          <span>โรงเรียน/ที่บ้านคัดสนุก</span>
-                          <span>พยัญชนะแผ่นที่ {pageIndex + 1}</span>
                         </div>
                       </div>
                       <div className="text-[10px] font-mono text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded border">
@@ -870,8 +858,6 @@ export default function App() {
                       {pageGroup.map((consonant, consIdx) => {
                         const triClass = getTriclass(consonant.character);
                         
-                        // Let's decide how to render the dynamic consonant layout styles
-                        
                         // Style 1: reading style (ฝึกอ่าน เขียนเส้นประ)
                         if (worksheetStyle === "reading") {
                           return (
@@ -887,8 +873,8 @@ export default function App() {
                                 selectedLayout === "4" ? "w-full justify-between" : ""
                               }`}>
                                 {/* Huge Consonant rendering styled with custom font */}
-                                <div className="flex flex-col items-center select-none">
-                                  <span className={`${activeFontClass} font-bold text-slate-900 leading-none ${
+                                <div className="flex flex-col items-center select-none font-bold">
+                                  <span className={`${activeFontClass} leading-none ${
                                     selectedLayout === "2" 
                                       ? "text-[120px] mb-2" 
                                       : selectedLayout === "3" 
@@ -917,7 +903,7 @@ export default function App() {
 
                                   {/* Traditional memorization poetryphrase */}
                                   {showTraditionalPhrases && (
-                                    <span className="text-xs font-bold text-slate-500 mt-1 font-sriracha">
+                                    <span className="text-xs font-bold text-slate-500 mt-1">
                                       {consonant.fullname}
                                     </span>
                                   )}
@@ -927,11 +913,6 @@ export default function App() {
                                     <span className={`text-[10px] font-semibold px-2 py-0.2 rounded-full border ${triClass.color}`}>
                                       {triClass.label}
                                     </span>
-                                    {showEnglishPhonetics && (
-                                      <span className="text-[9px] text-slate-400 bg-slate-50 px-1 rounded font-mono">
-                                        Sound: [{consonant.englishPhonetic}] ({consonant.meaning})
-                                      </span>
-                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -946,7 +927,7 @@ export default function App() {
                                   selectedLayout === "2" ? "w-28 h-28 text-6xl" : selectedLayout === "3" ? "w-22 h-22 text-5xl" : "hidden"
                                 }`}>
                                   <span className="relative z-10 transition-transform active:scale-125 select-none">{consonant.emoji}</span>
-                                  <span className="text-[10px] font-bold text-slate-400 block mt-1 tracking-wider uppercase font-mono">{consonant.meaning}</span>
+                                  <span className="text-xs font-bold text-slate-500 block mt-1">{consonant.name}</span>
                                   <span className="absolute -top-1.5 -right-1.5 text-[10px] text-pink-500">🌸</span>
                                 </div>
 
@@ -1002,8 +983,8 @@ export default function App() {
                             >
                               {/* Left Hollow letter for coloring */}
                               <div className="flex flex-col items-center flex-1 justify-center relative select-none">
-                                <span className="absolute -top-2 -left-2 text-xs font-bold text-slate-300 border border-slate-200 rounded px-1 group-hover:block uppercase bg-white">
-                                  Color Me!
+                                <span className="absolute -top-2 -left-2 text-[10px] font-bold text-slate-400 border border-slate-200 rounded px-1 group-hover:block bg-white">
+                                  ระบายสีอักษร
                                 </span>
                                 
                                 <span 
@@ -1030,11 +1011,11 @@ export default function App() {
                               {/* Right blank creative drawing box based on representational objects */}
                               <div className="flex-1 flex flex-col gap-2 justify-center h-full w-full">
                                 <div className="flex justify-between items-center select-none">
-                                  <span className="text-xs font-bold text-slate-700 font-mitr flex items-center gap-1">
+                                  <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
                                     <span>ระบายสี {consonant.name}</span>
                                     <span className="text-base">{consonant.emoji}</span>
                                   </span>
-                                  <span className="text-[10px] text-slate-400 font-sriracha">{consonant.fullname}</span>
+                                  <span className="text-[10px] text-slate-400">{consonant.fullname}</span>
                                 </div>
                                 
                                 {/* Large blank frame with dashed edge for children to sketch drawing */}
@@ -1082,10 +1063,10 @@ export default function App() {
                                 {/* Card Header Block */}
                                 <div className="flex items-center justify-between z-10 select-none pb-1.5 border-b border-dashed border-slate-200">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded-md font-mono font-bold text-slate-500">
-                                      NO. {THAI_ALPHABET.findIndex(item => item.character === consonant.character) + 1}
+                                    <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded-md font-bold text-slate-500">
+                                      ลำดับที่ {THAI_ALPHABET.findIndex(item => item.character === consonant.character) + 1}
                                     </span>
-                                    <span className="text-xs font-bold font-mitr text-slate-700">
+                                    <span className="text-xs font-bold text-slate-700">
                                       บัตรคำพยัญชนะไทยสุดคิ้วท์ 🎪
                                     </span>
                                   </div>
@@ -1139,14 +1120,12 @@ export default function App() {
                                     
                                     {/* Traditional mnemonic sub banner */}
                                     <div className="mt-2 text-center select-none">
-                                      <h5 className="text-xs font-black font-mitr text-slate-800 tracking-wide">
+                                      <h5 className="text-xs font-black text-slate-800 tracking-wide">
                                         {consonant.character} {consonant.name}
                                       </h5>
-                                      {showEnglishPhonetics && (
-                                        <span className="text-[9px] bg-slate-50 text-slate-500 font-mono font-bold px-1.5 py-0.2 rounded border mt-0.5 inline-block">
-                                          {consonant.meaning}
-                                        </span>
-                                      )}
+                                      <span className="text-[9px] bg-pink-50 text-pink-700 border border-pink-200/60 font-bold px-1.5 py-0.2 rounded mt-0.5 inline-block">
+                                        คำศัพท์: {consonant.name}
+                                      </span>
                                     </div>
                                   </div>
 
@@ -1155,21 +1134,19 @@ export default function App() {
                                 {/* Card Footer Poetry / Spelling Guide */}
                                 <div className="border-t-2 border-dashed border-slate-200 pt-2 z-10 select-none">
                                   {showTraditionalPhrases && (
-                                    <p className={`text-center font-extrabold leading-title font-sriracha tracking-wide text-slate-700 bg-white/70 backdrop-blur-3xs py-1 px-2 rounded-lg border border-slate-150 ${
+                                    <p className={`text-center font-extrabold leading-title tracking-wide text-slate-700 bg-white/70 backdrop-blur-3xs py-1 px-2 rounded-lg border border-slate-150 ${
                                       isLayout4 ? "text-[11px]" : "text-xs"
                                     }`}>
                                       🌻 "{consonant.fullname}"
                                     </p>
                                   )}
                                   
-                                  <div className="flex items-center justify-between text-[9px] text-slate-400 mt-1.5 font-mono px-1">
-                                    <span className="font-semibold text-slate-500 bg-slate-50 px-1 rounded">IPA: /{consonant.character}o/</span>
-                                    {showEnglishPhonetics && (
-                                      <span className="font-extrabold text-[#f472b6] animate-pulse flex items-center gap-1">
-                                        <span>เรียนสนุก คัดสนุก</span>
-                                        <span>💖</span>
-                                      </span>
-                                    )}
+                                  <div className="flex items-center justify-between text-[9px] text-slate-400 mt-1.5 px-1 font-semibold">
+                                    <span className="text-slate-500 bg-slate-50 px-1.5 py-0.2 rounded">เสียง: {consonant.pronunciation.split('-')[0]}</span>
+                                    <span className="font-extrabold text-[#f472b6] flex items-center gap-1">
+                                      <span>เรียนสนุก คัดสนุก</span>
+                                      <span>💖</span>
+                                    </span>
                                   </div>
                                 </div>
 
@@ -1218,11 +1195,9 @@ export default function App() {
             {/* Page Header */}
             <div className="w-full flex justify-between items-start border-b-2 border-slate-300 pb-2 mb-2">
               <div className="flex-1">
-                <h4 className="text-base font-bold text-slate-800 font-mitr leading-tight">{headerText}</h4>
+                <h4 className="text-base font-bold text-slate-800 leading-tight">{headerText}</h4>
                 <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-2">
                   <span className="font-semibold text-pink-600 bg-pink-100/50 px-1.5 py-0.2 rounded">วิชาภาษาไทย</span>
-                  <span>โรงเรียน/ที่บ้านคัดสนุก</span>
-                  <span>พยัญชนะแผ่นที่ {pageIndex + 1}</span>
                 </div>
               </div>
               <div className="text-xs font-mono text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded border">
@@ -1276,7 +1251,7 @@ export default function App() {
                           </div>
 
                           {showTraditionalPhrases && (
-                            <span className="text-xs font-bold text-slate-500 mt-1 font-sriracha">
+                            <span className="text-xs font-bold text-slate-500 mt-1">
                               {consonant.fullname}
                             </span>
                           )}
@@ -1285,11 +1260,6 @@ export default function App() {
                             <span className={`text-[10px] font-semibold px-2 py-0.2 rounded-full border ${triClass.color}`}>
                               {triClass.label}
                             </span>
-                            {showEnglishPhonetics && (
-                              <span className="text-[9px] text-slate-400 bg-slate-50 px-1 rounded font-mono">
-                                Sound: [{consonant.englishPhonetic}] ({consonant.meaning})
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -1299,7 +1269,7 @@ export default function App() {
                           selectedLayout === "2" ? "w-28 h-28 text-6xl" : selectedLayout === "3" ? "w-22 h-22 text-5xl" : "hidden"
                         }`}>
                           <span className="relative z-10">{consonant.emoji}</span>
-                          <span className="text-[10px] font-bold text-slate-400 block mt-1 tracking-wider uppercase font-mono">{consonant.meaning}</span>
+                          <span className="text-xs font-bold text-slate-500 block mt-1">{consonant.name}</span>
                         </div>
 
                         {showTracingGuides ? (
@@ -1361,11 +1331,11 @@ export default function App() {
 
                       <div className="flex-1 flex flex-col gap-2 justify-center h-full w-full">
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold text-slate-700 font-mitr flex items-center gap-1">
+                          <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
                             <span>ระบายสี {consonant.name}</span>
                             <span className="text-base">{consonant.emoji}</span>
                           </span>
-                          <span className="text-[10px] text-slate-400 font-sriracha">{consonant.fullname}</span>
+                          <span className="text-[10px] text-slate-400">{consonant.fullname}</span>
                         </div>
                         
                         <div className="border-2 border-dashed border-slate-300 rounded-xl flex-1 min-h-[70px] bg-slate-50 flex flex-col items-center justify-center p-3 text-center relative overflow-hidden">
@@ -1410,10 +1380,10 @@ export default function App() {
                         {/* Card Header Block */}
                         <div className="flex items-center justify-between z-10 pb-1.5 border-b border-dashed border-slate-200/80">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded-md font-mono font-bold text-slate-500">
-                              NO. {THAI_ALPHABET.findIndex(item => item.character === consonant.character) + 1}
+                            <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded-md font-bold text-slate-500">
+                              ลำดับที่ {THAI_ALPHABET.findIndex(item => item.character === consonant.character) + 1}
                             </span>
-                            <span className="text-xs font-bold font-mitr text-slate-700">
+                            <span className="text-xs font-bold text-slate-700">
                               บัตรคำพยัญชนะไทยสุดคิ้วท์ 🎪
                             </span>
                           </div>
@@ -1467,14 +1437,12 @@ export default function App() {
                             
                             {/* Traditional mnemonic sub banner */}
                             <div className="mt-2 text-center">
-                              <h5 className="text-xs font-black font-mitr text-slate-800 tracking-wide">
+                              <h5 className="text-xs font-black text-slate-800 tracking-wide">
                                 {consonant.character} {consonant.name}
                               </h5>
-                              {showEnglishPhonetics && (
-                                <span className="text-[9px] bg-slate-50 text-slate-500 font-mono font-bold px-1.5 py-0.2 rounded border mt-0.5 inline-block">
-                                  {consonant.meaning}
-                                </span>
-                              )}
+                              <span className="text-[9px] bg-pink-50 text-pink-700 border border-pink-200/60 font-bold px-1.5 py-0.2 rounded mt-0.5 inline-block">
+                                คำศัพท์: {consonant.name}
+                              </span>
                             </div>
                           </div>
 
@@ -1483,21 +1451,19 @@ export default function App() {
                         {/* Card Footer Poetry / Spelling Guide */}
                         <div className="border-t-2 border-dashed border-slate-200/80 pt-2 z-10">
                           {showTraditionalPhrases && (
-                            <p className={`text-center font-extrabold leading-title font-sriracha tracking-wide text-slate-700 bg-white/70 backdrop-blur-3xs py-1 px-2 rounded-lg border border-slate-150 ${
+                            <p className={`text-center font-extrabold leading-title tracking-wide text-slate-700 bg-white/70 backdrop-blur-3xs py-1 px-2 rounded-lg border border-slate-150 ${
                               isLayout4 ? "text-[11px]" : "text-xs"
                             }`}>
                               🌻 "{consonant.fullname}"
                             </p>
                           )}
                           
-                          <div className="flex items-center justify-between text-[9px] text-slate-400 mt-1.5 font-mono px-1">
-                            <span className="font-semibold text-slate-500 bg-slate-50 px-1 rounded">IPA: /{consonant.character}o/</span>
-                            {showEnglishPhonetics && (
-                              <span className="font-extrabold text-[#f472b6] animate-pulse flex items-center gap-1">
-                                <span>เรียนสนุก คัดสนุก</span>
-                                <span>💖</span>
-                              </span>
-                            )}
+                          <div className="flex items-center justify-between text-[9px] text-slate-400 mt-1.5 px-1 font-semibold">
+                            <span className="text-slate-500 bg-slate-50 px-1.5 py-0.2 rounded">เสียง: {consonant.pronunciation.split('-')[0]}</span>
+                            <span className="font-extrabold text-[#f472b6] flex items-center gap-1">
+                              <span>เรียนสนุก คัดสนุก</span>
+                              <span>💖</span>
+                            </span>
                           </div>
                         </div>
 
