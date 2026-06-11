@@ -837,9 +837,6 @@ export default function App() {
                           <span className="font-semibold text-pink-600 bg-pink-100/50 px-1.5 py-0.2 rounded">วิชาภาษาไทย</span>
                         </div>
                       </div>
-                      <div className="text-[10px] font-mono text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded border">
-                        A4 Page {pageIndex + 1}
-                      </div>
                     </div>
 
                     {/* Student Name Information Block */}
@@ -1159,15 +1156,9 @@ export default function App() {
                       })}
                     </div>
 
-                    {/* A4 Page Footer (Including credentials & page numbering) */}
-                    <div className="w-full flex justify-between items-center text-[10px] text-slate-400 border-t border-slate-200 mt-2 pt-2 select-none font-sans">
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-3 h-3 text-pink-500 fill-pink-500" />
-                        <span>สร้างสรรค์คู่กระดาษเรียน ประถม 1 โดย Titleza ({userEmail || "titleza2@hotmail.com"})</span>
-                      </div>
+                    {/* A4 Page Footer (Including page numbering) */}
+                    <div className="w-full flex justify-end items-center text-[10px] text-slate-400 border-t border-slate-200 mt-2 pt-2 select-none font-sans">
                       <div className="flex items-center gap-2 font-semibold text-slate-700">
-                        <span>ใบงานคำศัพท์ภาษาไทย ชุดที่ 1</span>
-                        <span>•</span>
                         <span>หน้า {pageIndex + 1} / {paginatedAlphabet.length}</span>
                       </div>
                     </div>
@@ -1199,9 +1190,6 @@ export default function App() {
                 <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-2">
                   <span className="font-semibold text-pink-600 bg-pink-100/50 px-1.5 py-0.2 rounded">วิชาภาษาไทย</span>
                 </div>
-              </div>
-              <div className="text-xs font-mono text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded border">
-                A4 Page {pageIndex + 1}
               </div>
             </div>
 
@@ -1477,13 +1465,8 @@ export default function App() {
             </div>
 
             {/* A4 Page Footer */}
-            <div className="w-full flex justify-between items-center text-[10px] text-slate-400 border-t border-slate-200 mt-2 pt-2">
-              <div className="flex items-center gap-1">
-                <span>สร้างสรรค์คู่กระดาษเรียน ประถม 1 โดย Titleza ({userEmail || "titleza2@hotmail.com"})</span>
-              </div>
+            <div className="w-full flex justify-end items-center text-[10px] text-slate-400 border-t border-slate-200 mt-2 pt-2">
               <div className="flex items-center gap-2 font-semibold text-slate-700">
-                <span>ใบงานคำศัพท์ภาษาไทย ชุดที่ 1</span>
-                <span>•</span>
                 <span>หน้า {pageIndex + 1} / {paginatedAlphabet.length}</span>
               </div>
             </div>
