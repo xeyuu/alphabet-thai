@@ -2,7 +2,7 @@ export interface ThaiConsonant {
   character: string; // The letter itself, e.g., 'ก'
   name: string; // The representation, e.g., 'ไก่'
   fullname: string; // The complete memorization phrase, e.g., 'ก เอ๋ย ก ไก่'
-  pronunciation: string; // The pronunciation phonetic text, e.g., 'กอ'
+  pronunciation: string; // The pronunciation phonetic text, e.g., 'กอ-ไก่'
   emoji: string; // Cute emoji representation, e.g., '🐔'
   englishName: string; // English transcription, e.g., 'Ko Kai'
   englishPhonetic: string; // English raw pronunciation, e.g., 'k'
@@ -14,7 +14,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
     character: "ก",
     name: "ไก่",
     fullname: "ก เอ๋ย ก ไก่",
-    pronunciation: "กอ-เอ๋ย-กอ-ไก่",
+    pronunciation: "กอ-ไก่",
     emoji: "🐔",
     englishName: "Ko Kai",
     englishPhonetic: "k-",
@@ -23,7 +23,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ข",
     name: "ไข่",
-    fullname: "ข ไข่ ใน เล้า",
+    fullname: "ข ไข่ ในเล้า",
     pronunciation: "ขอ-ไข่",
     emoji: "🥚",
     englishName: "Kho Khai",
@@ -33,7 +33,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฃ",
     name: "ขวด",
-    fullname: "ฃ ขวด ของ เรา",
+    fullname: "ฃ ขวด ของเรา",
     pronunciation: "ขอ-ขวด",
     emoji: "🍾",
     englishName: "Kho Khuat",
@@ -43,7 +43,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ค",
     name: "ควาย",
-    fullname: "ค ควาย เข้า นา",
+    fullname: "ค ควาย เข้านา",
     pronunciation: "คอ-ควาย",
     emoji: "🐃",
     englishName: "Kho Khwai",
@@ -53,7 +53,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฅ",
     name: "คน",
-    fullname: "ฅ คน ขึง ขัง",
+    fullname: "ฅ คน ขึงขัง",
     pronunciation: "คอ-คน",
     emoji: "🧑",
     englishName: "Kho Khon",
@@ -63,8 +63,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฆ",
     name: "ระฆัง",
-    fullname: "ฆ ระฆัง ข้าง ฝา",
-    pronunciation: "คอ-ระ-ฆัง",
+    fullname: "ฆ ระฆัง ข้างฝา",
+    pronunciation: "คอ-ระฆัง",
     emoji: "🔔",
     englishName: "Kho Rakhang",
     englishPhonetic: "kh-",
@@ -73,7 +73,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ง",
     name: "งู",
-    fullname: "ง งู ใจ กล้า",
+    fullname: "ง งู ใจกล้า",
     pronunciation: "งอ-งู",
     emoji: "🐍",
     englishName: "Ngo Ngu",
@@ -83,7 +83,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "จ",
     name: "จาน",
-    fullname: "จ จาน ใช้ ดี",
+    fullname: "จ จาน ใช้ดี",
     pronunciation: "จอ-จาน",
     emoji: "🍽️",
     englishName: "Cho Chan",
@@ -93,7 +93,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฉ",
     name: "ฉิ่ง",
-    fullname: "ฉ ฉิ่ง ตี ดัง",
+    fullname: "ฉ ฉิ่ง ตีดัง",
     pronunciation: "ฉอ-ฉิ่ง",
     emoji: "🥁",
     englishName: "Cho Ching",
@@ -103,7 +103,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ช",
     name: "ช้าง",
-    fullname: "ช ช้าง วิ่ง หนี",
+    fullname: "ช ช้าง วิ่งหนี",
     pronunciation: "ชอ-ช้าง",
     emoji: "🐘",
     englishName: "Cho Chang",
@@ -113,7 +113,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ซ",
     name: "โซ่",
-    fullname: "ซ โซ่ ล่าม ที",
+    fullname: "ซ โซ่ ล่ามที",
     pronunciation: "ซอ-โซ่",
     emoji: "⛓️",
     englishName: "So So",
@@ -123,7 +123,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฌ",
     name: "เฌอ",
-    fullname: "ฌ เฌอ คู่ กัน",
+    fullname: "ฌ เฌอ คู่กัน",
     pronunciation: "ชอ-เฌอ",
     emoji: "🌳",
     englishName: "Cho Choe",
@@ -133,7 +133,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ญ",
     name: "หญิง",
-    fullname: "ญ หญิง โสภา",
+    fullname: "ญ หญิง แสนสวย",
     pronunciation: "ยอ-หญิง",
     emoji: "👩",
     englishName: "Yo Ying",
@@ -143,8 +143,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฎ",
     name: "ชฎา",
-    fullname: "ฎ ชฎา สวม พลัน",
-    pronunciation: "ดอ-ชะ-ดา",
+    fullname: "ฎ ชฎา ยอดแหลม",
+    pronunciation: "ดอ-ชฎา",
     emoji: "👑",
     englishName: "Do Chada",
     englishPhonetic: "d-",
@@ -153,8 +153,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฏ",
     name: "ปฏัก",
-    fullname: "ฏ ปฏัก หุนหัน",
-    pronunciation: "ตอ-ปะ-ตัก",
+    fullname: "ฏ ปฏัก แหลมคม",
+    pronunciation: "ตอ-ปฏัก",
     emoji: "🔱",
     englishName: "To Patak",
     englishPhonetic: "t-",
@@ -163,7 +163,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฐ",
     name: "ฐาน",
-    fullname: "ฐ ฐาน เข้า มา รอง",
+    fullname: "ฐ ฐาน มั่นคง",
     pronunciation: "ถอ-ฐาน",
     emoji: "⛩️",
     englishName: "Tho Than",
@@ -173,8 +173,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฑ",
     name: "มณโฑ",
-    fullname: "ฑ นางมณโฑ หน้า ขาว",
-    pronunciation: "ทอ-มน-โท",
+    fullname: "ฑ มณโฑ แสนสวย",
+    pronunciation: "ทอ-มณโฑ",
     emoji: "👸",
     englishName: "Tho Montho",
     englishPhonetic: "th-",
@@ -183,8 +183,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฒ",
     name: "ผู้เฒ่า",
-    fullname: "ฒ ผู้เฒ่า เดิน ย่อง",
-    pronunciation: "ทอ-ผู้-เฒ่า",
+    fullname: "ฒ ผู้เฒ่า ใจดี",
+    pronunciation: "ทอ-ผู้เฒ่า",
     emoji: "👴",
     englishName: "Tho Phuthao",
     englishPhonetic: "th-",
@@ -193,7 +193,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ณ",
     name: "เณร",
-    fullname: "ณ เณร ไม่ มอง",
+    fullname: "ณ เณร แสนสงบ",
     pronunciation: "นอ-เณร",
     emoji: "👦",
     englishName: "No Nen",
@@ -203,7 +203,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ด",
     name: "เด็ก",
-    fullname: "ด เด็ก ต้อง นิมนต์",
+    fullname: "ด เด็ก แสนดี",
     pronunciation: "ดอ-เด็ก",
     emoji: "👶",
     englishName: "Do Dek",
@@ -213,7 +213,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ต",
     name: "เต่า",
-    fullname: "ต เต่า หลัง ตุง",
+    fullname: "ต เต่า หลังตุง",
     pronunciation: "ตอ-เต่า",
     emoji: "🐢",
     englishName: "To Tao",
@@ -223,7 +223,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ถ",
     name: "ถุง",
-    fullname: "ถ ถุง แบก ขน",
+    fullname: "ถ ถุง ใส่ของ",
     pronunciation: "ถอ-ถุง",
     emoji: "🎒",
     englishName: "Tho Thung",
@@ -234,7 +234,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
     character: "ท",
     name: "ทหาร",
     fullname: "ท ทหาร อดทน",
-    pronunciation: "ทอ-ทะ-หาร",
+    pronunciation: "ทอ-ทหาร",
     emoji: "💂",
     englishName: "Tho Thahan",
     englishPhonetic: "th-",
@@ -243,7 +243,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ธ",
     name: "ธง",
-    fullname: "ธ ธง คน นิยม",
+    fullname: "ธ ธง ชาติไทย",
     pronunciation: "ทอ-ธง",
     emoji: "🇹🇭",
     englishName: "Tho Thong",
@@ -253,7 +253,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "น",
     name: "หนู",
-    fullname: "น หนู ขวักไขว่",
+    fullname: "น หนู วิ่งวุ่น",
     pronunciation: "นอ-หนู",
     emoji: "🐭",
     englishName: "No Nhu",
@@ -263,8 +263,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "บ",
     name: "ใบไม้",
-    fullname: "บ ใบไม้ ทับถม",
-    pronunciation: "บอ-ใบ-ไม้",
+    fullname: "บ ใบไม้ สีเขียว",
+    pronunciation: "บอ-ใบไม้",
     emoji: "🍃",
     englishName: "Bo Baimai",
     englishPhonetic: "b-",
@@ -283,7 +283,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ผ",
     name: "ผึ้ง",
-    fullname: "ผ ผึ้ง ทำ รัง",
+    fullname: "ผ ผึ้ง ทำรัง",
     pronunciation: "ผอ-ผึ้ง",
     emoji: "🐝",
     englishName: "Pho Phueng",
@@ -303,7 +303,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "พ",
     name: "พาน",
-    fullname: "พ พาน วาง ตั้ง",
+    fullname: "พ พาน ใส่ของ",
     pronunciation: "พอ-พาน",
     emoji: "🧺",
     englishName: "Pho Phan",
@@ -313,7 +313,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฟ",
     name: "ฟัน",
-    fullname: "ฟ ฟัน สะอาด จัง",
+    fullname: "ฟ ฟัน สะอาดจัง",
     pronunciation: "ฟอ-ฟัน",
     emoji: "🦷",
     englishName: "Fo Fan",
@@ -323,8 +323,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ภ",
     name: "สำเภา",
-    fullname: "ภ สำเภา กาง ใบ",
-    pronunciation: "พอ-สำ-เภา",
+    fullname: "ภ สำเภา กางใบ",
+    pronunciation: "พอ-สำเภา",
     emoji: "⛵",
     englishName: "Pho Samphao",
     englishPhonetic: "ph-",
@@ -343,7 +343,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ย",
     name: "ยักษ์",
-    fullname: "ย ยักษ์ เขี้ยว ใหญ่",
+    fullname: "ย ยักษ์ เขี้ยวใหญ่",
     pronunciation: "ยอ-ยักษ์",
     emoji: "👹",
     englishName: "Yo Yak",
@@ -353,7 +353,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ร",
     name: "เรือ",
-    fullname: "ร เรือ พาย ไป",
+    fullname: "ร เรือ พายไป",
     pronunciation: "รอ-เรือ",
     emoji: "🛶",
     englishName: "Ro Ruea",
@@ -363,7 +363,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ล",
     name: "ลิง",
-    fullname: "ล ลิง ไต่ ราว",
+    fullname: "ล ลิง ไต่ราว",
     pronunciation: "ลอ-ลิง",
     emoji: "🐒",
     englishName: "Lo Ling",
@@ -373,7 +373,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ว",
     name: "แหวน",
-    fullname: "ว แหวน ลง ยา",
+    fullname: "ว แหวน แสนสวย",
     pronunciation: "วอ-แหวน",
     emoji: "💍",
     englishName: "Wo Waen",
@@ -383,8 +383,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ศ",
     name: "ศาลา",
-    fullname: "ศ ศาลา เงียบเหงา",
-    pronunciation: "สอ-สา-ลา",
+    fullname: "ศ ศาลา พักผ่อน",
+    pronunciation: "สอ-ศาลา",
     emoji: "🛕",
     englishName: "So Sala",
     englishPhonetic: "s-",
@@ -393,8 +393,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ษ",
     name: "ฤๅษี",
-    fullname: "ษ ษ ฤๅษี หนวด ยาว",
-    pronunciation: "สอ-รือ-สี",
+    fullname: "ษ ฤๅษี หนวดยาว",
+    pronunciation: "สอ-ฤๅษี",
     emoji: "🧙‍♂️",
     englishName: "So Ruesi",
     englishPhonetic: "s-",
@@ -403,7 +403,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ส",
     name: "เสือ",
-    fullname: "ส เสือ ดาวคะนอง",
+    fullname: "ส เสือ แสนดุ",
     pronunciation: "สอ-เสือ",
     emoji: "🐯",
     englishName: "So Suea",
@@ -413,7 +413,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ห",
     name: "หีบ",
-    fullname: "ห หีบ ใส่ ผ้า",
+    fullname: "ห หีบ ใส่ผ้า",
     pronunciation: "หอ-หีบ",
     emoji: "📦",
     englishName: "Ho Hip",
@@ -423,8 +423,8 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "ฬ",
     name: "จุฬา",
-    fullname: "ฬ จุฬา ท่าผยอง",
-    pronunciation: "ลอ-จุ-ลา",
+    fullname: "ฬ จุฬา ว่าวไทย",
+    pronunciation: "ลอ-จุฬา",
     emoji: "🪁",
     englishName: "Lo Chula",
     englishPhonetic: "l-",
@@ -433,7 +433,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
   {
     character: "อ",
     name: "อ่าง",
-    fullname: "อ อ่าง เนืองนอง",
+    fullname: "อ อ่าง ใส่น้ำ",
     pronunciation: "ออ-อ่าง",
     emoji: "🥣",
     englishName: "O Ang",
@@ -444,7 +444,7 @@ export const THAI_ALPHABET: ThaiConsonant[] = [
     character: "ฮ",
     name: "นกฮูก",
     fullname: "ฮ นกฮูก ตาโต",
-    pronunciation: "ฮอ-นก-ฮูก",
+    pronunciation: "ฮอ-นกฮูก",
     emoji: "🦉",
     englishName: "Ho Nokhuk",
     englishPhonetic: "h-",

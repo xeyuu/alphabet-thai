@@ -29,6 +29,7 @@ import {
   Eye
 } from "lucide-react";
 import { THAI_ALPHABET, ThaiConsonant } from "./data/thaiAlphabet";
+import { ThaiIllustration } from "./components/ThaiIllustration";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -37,6 +38,7 @@ export default function App() {
   // --- States ---
   const [selectedLayout, setSelectedLayout] = useState<"2" | "3" | "4">("3"); // Consonants per page
   const [worksheetStyle, setWorksheetStyle] = useState<"reading" | "coloring" | "flashcard">("reading");
+  const [illustrationStyle, setIllustrationStyle] = useState<"openmoji" | "openmoji_drawing" | "twemoji">("openmoji");
   const [selectedFont, setSelectedFont] = useState<"itim" | "mali" | "pridi" | "sarabun">("itim");
   const [themeColor, setThemeColor] = useState<"pink" | "blue" | "green" | "yellow" | "purple" | "mono">("pink");
   const [headerText, setHeaderText] = useState("ใบงานฝึกอ่านและคัดลายมือภาษาไทย (ชั้นประถมศึกษาปีที่ 1)");
@@ -219,30 +221,120 @@ export default function App() {
 
   const activeFontClass = FONT_CLASSES[selectedFont as "itim" | "mali" | "pridi" | "sarabun"] || "font-itim";
 
-  // Helper to render high quality vector cartoon illustration using Twemoji CDN with text/emoji fallback
+  // Official Fluent Emoji Names Mapping for the 44 consonants
+  const FLUENT_EMOJI_MAP: Record<string, string> = {
+    "🐔": "Chicken",
+    "🥚": "Egg",
+    "🍾": "Wine bottle",
+    "🐃": "Water buffalo",
+    "🧑": "Person",
+    "🔔": "Bell",
+    "🐍": "Snake",
+    "🍽️": "Fork and knife with plate",
+    "🥁": "Drum",
+    "🐘": "Elephant",
+    "⛓️": "Chain",
+    "🌳": "Deciduous tree",
+    "👩": "Woman",
+    "👑": "Crown",
+    "🔱": "Trident emblem",
+    "⛩️": "Shinto shrine",
+    "👸": "Princess",
+    "👴": "Old man",
+    "👦": "Boy",
+    "👶": "Baby",
+    "🐢": "Turtle",
+    "🎒": "Backpack",
+    "💂": "Guard",
+    "🇹🇭": "Flag Thailand",
+    "🐭": "Mouse face",
+    "🍃": "Leaf fluttering in wind",
+    "🐟": "Fish",
+    "🐝": "Honeybee",
+    "🍳": "Cooking",
+    "🧺": "Basket",
+    "🦷": "Tooth",
+    "⛵": "Sailboat",
+    "🐎": "Horse",
+    "👹": "Ogre",
+    "🛶": "Canoe",
+    "🐒": "Monkey",
+    "💍": "Ring",
+    "🛕": "Hindu temple",
+    "🧙‍♂️": "Man mage",
+    "🐯": "Tiger face",
+    "📦": "Package",
+    "🪁": "Kite",
+    "🥣": "Bowl with spoon",
+    "🦉": "Owl"
+  };
+
+  // Helper to render high quality custom vector cartoon illustration with multiple premium style catalogs and fail-safes
   const renderCuteIllustration = (emoji: string, sizeClass: string, altText: string) => {
-    const codePoints = Array.from(emoji)
+    const matchedConsonant = THAI_ALPHABET.find(
+      c => c.name === altText || c.emoji === emoji
+    );
+
+    const actualEmoji = matchedConsonant?.emoji || emoji;
+
+    // Convert emoji to standard clean Hex sequence
+    const codePoints = Array.from(actualEmoji)
       .map(char => char.codePointAt(0)!.toString(16))
       .filter(hex => hex !== "fe0f");
     const hex = codePoints.join("-");
-    const url = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${hex}.svg`;
+
+    let imgUrl = "";
+    const isHandcrafted = illustrationStyle === "handcrafted";
+
+    if (illustrationStyle === "fluent") {
+      const folder = FLUENT_EMOJI_MAP[actualEmoji];
+      if (folder) {
+        const file = folder.toLowerCase().replace(/ /g, "_") + "_3d";
+        imgUrl = `https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/${encodeURIComponent(folder)}/3D/${file}.png`;
+      } else {
+        // Fallback to Twemoji path
+        imgUrl = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${hex.toLowerCase()}.svg`;
+      }
+    } else if (illustrationStyle === "openmoji") {
+      imgUrl = `https://cdn.jsdelivr.net/npm/openmoji@15.0.0/color/svg/${hex.toUpperCase()}.svg`;
+    } else if (illustrationStyle === "openmoji_drawing") {
+      imgUrl = `https://cdn.jsdelivr.net/npm/openmoji@15.0.0/black/svg/${hex.toUpperCase()}.svg`;
+    } else if (illustrationStyle === "twemoji") {
+      imgUrl = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${hex.toLowerCase()}.svg`;
+    }
 
     return (
       <div className={`relative flex items-center justify-center ${sizeClass}`}>
-        <img 
-          src={url} 
-          alt={altText} 
-          className="w-full h-full object-contain select-none"
-          referrerPolicy="no-referrer"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-            if (fallback) fallback.style.display = 'block';
-          }}
-        />
-        <span className="hidden select-none font-sans text-center leading-none" style={{ fontSize: 'inherit' }}>
-          {emoji}
-        </span>
+        {isHandcrafted && matchedConsonant ? (
+          <ThaiIllustration character={matchedConsonant.character} className="w-full h-full" />
+        ) : (
+          <>
+            <img 
+              src={imgUrl} 
+              alt={altText} 
+              className="w-full h-full object-contain select-none transition-all duration-300"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                // Failsafe chain: If premium 3D fails, fall back to standard Twemoji or handcrafted SVG
+                const target = e.currentTarget;
+                if (matchedConsonant) {
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    const textFallback = parent.querySelector('.text-fallback') as HTMLElement;
+                    if (textFallback) textFallback.style.display = 'block';
+                  }
+                } else {
+                  target.src = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${hex.toLowerCase()}.svg`;
+                }
+              }}
+            />
+            {/* Absolute last resort text fallback normally hidden */}
+            <span className="hidden text-fallback select-none font-sans text-center leading-none animate-pulse text-5xl" style={{ fontSize: 'inherit' }}>
+              {actualEmoji}
+            </span>
+          </>
+        )}
       </div>
     );
   };
@@ -439,9 +531,9 @@ export default function App() {
               <label className="text-xs font-semibold text-slate-500">การจัดหน้า (จำนวนพยัญชนะต่อแผ่น A4)</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { key: "2", label: "2 ตัวอักษร", desc: "คัลแลนด์จัมโบ้" },
-                  { key: "3", label: "3 ตัวอักษร", desc: "มาตรฐานพอดี" },
-                  { key: "4", label: "4 ตัวอักษร", desc: "ประหยัด 2x2" }
+                  { key: "2", label: "2 ตัวอักษร", desc: "ขนาดใหญ่พิเศษ" },
+                  { key: "3", label: "3 ตัวอักษร", desc: "ขนาดมาตรฐาน" },
+                  { key: "4", label: "4 ตัวอักษร", desc: "ขนาดพกประหยัด" }
                 ].map((layout) => (
                   <button
                     key={layout.key}
@@ -459,11 +551,9 @@ export default function App() {
                   </button>
                 ))}
               </div>
-            </div>
-
-            {/* Style Variant selection */}
+            </div>            {/* Style Variant selection */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-slate-500">รูปแบบการนำเสนอ</label>
+              <label className="text-xs font-semibold text-slate-500">รูปแบบใบงานหลัก</label>
               <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl">
                 {[
                   { key: "reading", label: "ฝึกอ่านคัดไทย", icon: "✏️" },
@@ -472,7 +562,15 @@ export default function App() {
                 ].map((style) => (
                   <button
                     key={style.key}
-                    onClick={() => setWorksheetStyle(style.key as any)}
+                    onClick={() => {
+                      setWorksheetStyle(style.key as any);
+                      // Smart defaults: switch to black outline drawing when entering color mode
+                      if (style.key === "coloring") {
+                        setIllustrationStyle("openmoji_drawing");
+                      } else if (illustrationStyle === "openmoji_drawing") {
+                        setIllustrationStyle("openmoji"); // default back to lovely color openmoji
+                      }
+                    }}
                     className={`py-1.5 px-1 rounded-lg text-xs font-medium text-center transition flex flex-col items-center gap-1 cursor-pointer ${
                       worksheetStyle === style.key 
                         ? "bg-white text-slate-900 shadow-2xs font-semibold" 
@@ -484,6 +582,38 @@ export default function App() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Illustration Style selection */}
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-semibold text-slate-500">รูปแบบภาพประกอบพยัญชนะ</label>
+                <span className="text-[10px] text-pink-500 font-medium">ภาพลิขสิทธิ์คมชัดสูง</span>
+              </div>
+              <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl">
+                {[
+                  { key: "openmoji", label: "การ์ตูนสี", desc: "OpenMoji Hand-drawn Color", icon: "🧸" },
+                  { key: "openmoji_drawing", label: "ภาพระบายสี", desc: "OpenMoji Outline", icon: "🖍️" },
+                  { key: "twemoji", label: "แบนเรียบ", desc: "Twitter Flat Classic", icon: "🐣" }
+                ].map((style) => (
+                  <button
+                    key={style.key}
+                    onClick={() => setIllustrationStyle(style.key as any)}
+                    title={style.desc}
+                    className={`py-1.5 px-0.5 rounded-lg text-xs font-medium text-center transition flex flex-col items-center gap-0.5 cursor-pointer ${
+                      illustrationStyle === style.key 
+                        ? "bg-white text-slate-900 shadow-2xs font-semibold ring-1 ring-slate-200" 
+                        : "text-slate-500 hover:text-slate-700 hover:bg-white/40"
+                    }`}
+                  >
+                    <span className="text-sm">{style.icon}</span>
+                    <span className="text-[9px] tracking-tight font-medium leading-[1.1] text-center w-full truncate">{style.label}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-slate-400">
+                *เลือก <span className="font-semibold text-slate-500">ภาพระบายสี</span> เพื่อสร้างใบงานฝึกกล้ามเนื้อมือให้เด็กระบายสีเองได้จริง!
+              </p>
             </div>
 
             {/* Font Selector */}
@@ -893,25 +1023,32 @@ export default function App() {
                               }`}
                             >
                               
-                              {/* Left/Upper info area containing main characters */}
+                              {/* Left/Upper info area containing main characters (60% weight) */}
                               <div className={`flex items-center gap-4 ${
-                                selectedLayout === "4" ? "w-full justify-between" : ""
+                                selectedLayout === "4" ? "w-full justify-between" : "flex-[3_3_0%] w-[60%]"
                               }`}>
                                 {/* Huge Consonant rendering styled with custom font */}
                                 <div className="flex flex-col items-center select-none font-bold">
-                                  <span className={`${activeFontClass} leading-none ${
-                                    selectedLayout === "2" 
-                                      ? "text-[180px] mb-2" 
-                                      : selectedLayout === "3" 
-                                      ? "text-[135px] mb-1" 
-                                      : "text-[105px]"
-                                  }`}>
-                                    {consonant.character}
-                                  </span>
-                                  {/* Consonant description sound bubble */}
-                                  <span className="bg-slate-900 text-white text-[11px] px-2.5 py-0.5 rounded-full font-bold">
-                                    {consonant.pronunciation}
-                                  </span>
+                                  {(() => {
+                                    const isDescender = ["ญ", "ฎ", "ฏ", "ฐ"].includes(consonant.character);
+                                    return (
+                                      <>
+                                        <span className={`${activeFontClass} leading-none ${
+                                          selectedLayout === "2" 
+                                            ? `text-[180px] ${isDescender ? "mb-11 pb-5" : "mb-2"}` 
+                                            : selectedLayout === "3" 
+                                            ? `text-[135px] ${isDescender ? "mb-7 pb-3" : "mb-1"}` 
+                                            : `text-[105px] ${isDescender ? "mb-5 pb-2" : ""}`
+                                        }`}>
+                                          {consonant.character}
+                                        </span>
+                                        {/* Consonant description sound bubble */}
+                                        <span className={`bg-slate-900 text-white text-[11px] px-2.5 py-0.5 rounded-full font-bold ${isDescender ? "mt-1.5" : ""}`}>
+                                          {consonant.pronunciation}
+                                        </span>
+                                      </>
+                                    );
+                                  })()}
                                 </div>
 
                                 {/* Divider dotted */}
@@ -942,19 +1079,21 @@ export default function App() {
                                 </div>
                               </div>
 
-                              {/* Right illustration / Tracing Guide Area */}
+                              {/* Right illustration / Tracing Guide Area (40% weight) */}
                               <div className={`flex items-center gap-4 ${
-                                selectedLayout === "4" ? "w-full flex-col mt-2 pt-2 border-t border-dashed border-slate-200" : "flex-1 ml-6 justify-end"
+                                selectedLayout === "4" 
+                                  ? "w-full flex-col mt-2 pt-2 border-t border-dashed border-slate-200" 
+                                  : "flex-[2_2_0%] w-[40%] ml-6 justify-end"
                               }`}>
                                 
                                 {/* Right Cute illustration Box */}
                                 <div className={`flex flex-col items-center justify-center p-2 bg-slate-50/50 rounded-xl border border-dashed select-none relative ${activeTheme.border} ${
-                                  selectedLayout === "2" ? "w-28 h-28 text-6xl" : selectedLayout === "3" ? "w-22 h-22 text-5xl" : "hidden"
+                                  selectedLayout === "2" ? "w-44 h-44 text-7xl" : selectedLayout === "3" ? "w-36 h-36 text-6xl" : "w-28 h-28 text-5xl"
                                 }`}>
                                   <div className="relative z-10 transition-transform active:scale-125 select-none">
                                     {renderCuteIllustration(
                                       consonant.emoji,
-                                      selectedLayout === "2" ? "w-14 h-14 animate-pulse" : "w-10 h-10 animate-pulse",
+                                      selectedLayout === "2" ? "w-36 h-36 animate-pulse" : selectedLayout === "3" ? "w-28 h-28 animate-pulse" : "w-20 h-20 animate-pulse",
                                       consonant.name
                                     )}
                                   </div>
@@ -1011,50 +1150,65 @@ export default function App() {
                                 selectedLayout === "4" ? "flex-col justify-between p-3" : "flex-row items-center justify-between gap-6"
                               }`}
                             >
-                              {/* Left Hollow letter for coloring */}
-                              <div className="flex flex-col items-center flex-1 justify-center relative select-none">
+                              {/* Left Hollow letter for coloring (60% weight) */}
+                              <div className={`flex flex-col items-center justify-center relative select-none ${
+                                selectedLayout === "4" ? "flex-1 w-full" : "flex-[3_3_0%] w-[60%]"
+                              }`}>
                                 <span className="absolute -top-2 -left-2 text-[10px] font-bold text-slate-400 border border-slate-200 rounded px-1 group-hover:block bg-white">
                                   ระบายสีอักษร
                                 </span>
                                 
-                                <span 
-                                  className={`${activeFontClass} font-extrabold text-transparent leading-none z-10 select-none ${
-                                    selectedLayout === "2" 
-                                      ? "text-[210px]" 
-                                      : selectedLayout === "3" 
-                                      ? "text-[150px]" 
-                                      : "text-[120px]"
-                                  }`}
-                                  style={{ 
-                                    WebkitTextStroke: "3px #0f172a",
-                                    letterSpacing: "0.05em"
-                                  }}
-                                >
-                                  {consonant.character}
-                                </span>
-                                <span className="text-xs font-bold text-slate-500 mt-2">ระบายสี พยัญชนะ "{consonant.character}"</span>
+                                {(() => {
+                                  const isDescender = ["ญ", "ฎ", "ฏ", "ฐ"].includes(consonant.character);
+                                  return (
+                                    <>
+                                      <span 
+                                        className={`${activeFontClass} font-extrabold text-transparent leading-none z-10 select-none ${
+                                          selectedLayout === "2" 
+                                            ? `text-[210px] ${isDescender ? "pb-12" : ""}` 
+                                            : selectedLayout === "3" 
+                                            ? `text-[150px] ${isDescender ? "pb-9" : ""}` 
+                                            : `text-[120px] ${isDescender ? "pb-6" : ""}`
+                                        }`}
+                                        style={{ 
+                                          WebkitTextStroke: "3px #0f172a",
+                                          letterSpacing: "0.05em"
+                                        }}
+                                      >
+                                        {consonant.character}
+                                      </span>
+                                      <span className={`text-xs font-bold text-slate-500 ${isDescender ? "mt-5" : "mt-2"}`}>ระบายสี พยัญชนะ "{consonant.character}"</span>
+                                    </>
+                                  );
+                                })()}
                               </div>
 
                               {/* Middle divide line */}
                               <div className={`w-0.5 h-20 border-l-2 border-dotted ${activeTheme.border} ${selectedLayout === "4" ? "hidden" : ""}`} />
 
-                              {/* Right blank creative drawing box based on representational objects */}
-                              <div className="flex-1 flex flex-col gap-2 justify-center h-full w-full">
+                              {/* Right blank creative drawing box based on representational objects (40% weight) */}
+                              <div className={`flex flex-col gap-2 justify-center h-full ${
+                                selectedLayout === "4" ? "flex-1 w-full" : "flex-[2_2_0%] w-[40%]"
+                              }`}>
                                 <div className="flex justify-between items-center select-none">
-                                  <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                  <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                                     <span>ระบายสี {consonant.name}</span>
-                                    {renderCuteIllustration(consonant.emoji, "w-5 h-5", consonant.name)}
+                                    {renderCuteIllustration(consonant.emoji, "w-8 h-8", consonant.name)}
                                   </span>
                                   <span className="text-[10px] text-slate-400">{consonant.fullname}</span>
                                 </div>
                                 
                                 {/* Large blank frame with dashed edge for children to sketch drawing */}
-                                <div className="border-2 border-dashed border-slate-300 rounded-xl flex-1 min-h-[70px] bg-slate-50/50 flex flex-col items-center justify-center p-3 text-center select-none relative overflow-hidden">
-                                  <div className="opacity-15">
-                                    {renderCuteIllustration(consonant.emoji, "w-14 h-14", consonant.name)}
+                                <div className="border-2 border-dashed border-slate-300 rounded-xl flex-1 min-h-[130px] bg-slate-50/50 flex flex-col items-center justify-center p-3 text-center select-none relative overflow-hidden">
+                                  <div className="opacity-20 hover:opacity-35 transition-opacity duration-300">
+                                    {renderCuteIllustration(
+                                      consonant.emoji,
+                                      selectedLayout === "2" ? "w-44 h-44" : selectedLayout === "3" ? "w-36 h-36" : "w-28 h-28",
+                                      consonant.name
+                                    )}
                                   </div>
-                                  <span className="text-[9px] text-slate-400 font-bold mt-1 block group">
-                                    ฝึกวาดรูปหรือระบายสี '{consonant.name}' ตรงนี้ 🎨
+                                  <span className="text-[10px] text-slate-400 font-bold mt-2 block group">
+                                    ระบายสีหรือหัดวาด '{consonant.name}' ตรงนี้ 🎨
                                   </span>
                                   <span className="absolute bottom-1 right-2 text-slate-300 text-[9.5px]">หนูรักภาษาไทย</span>
                                 </div>
@@ -1110,39 +1264,46 @@ export default function App() {
                                   isLayout4 ? "flex-col justify-center text-center gap-1.5" : "flex-row justify-around"
                                 }`}>
                                   
-                                  {/* Left: Giant playful consonant box */}
-                                  <div className="flex flex-col items-center justify-center">
+                                  {/* Left: Giant playful consonant box (60% weight) */}
+                                  <div className={`flex flex-col items-center justify-center ${!isLayout4 ? "flex-[3_3_0%] w-[60%]" : ""}`}>
                                     <div className="relative group">
                                       {/* Playful drop background bubble */}
                                       <div className={`absolute -inset-1.5 bg-${themeColor === 'mono' ? 'slate-100' : themeColor + '-100'} bg-opacity-70 rounded-2xl opacity-75 blur-xs transition-all duration-300 group-hover:opacity-100`} />
                                       <div className={`relative bg-white border border-slate-200 shadow-2xs rounded-2xl px-5 py-2 flex flex-col items-center justify-center ${
                                         isLayout2 ? "min-w-[195px] px-6 py-3" : isLayout3 ? "min-w-[155px]" : "min-w-[115px]"
                                       }`}>
-                                        <span className={`${activeFontClass} font-black tracking-tight leading-none text-slate-900 ${
-                                          isLayout2 
-                                            ? "text-[210px]" 
-                                            : isLayout3 
-                                            ? "text-[160px]" 
-                                            : "text-[115px]"
-                                        }`}>
-                                          {consonant.character}
-                                        </span>
-                                        <div className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full text-white bg-slate-900 shadow-4xs mt-1">
-                                          {consonant.pronunciation.split('-')[0]}
-                                        </div>
+                                        {(() => {
+                                          const isDescender = ["ญ", "ฎ", "ฏ", "ฐ"].includes(consonant.character);
+                                          return (
+                                            <>
+                                              <span className={`${activeFontClass} font-black tracking-tight leading-none text-slate-900 ${
+                                                isLayout2 
+                                                  ? `text-[210px] ${isDescender ? "pb-12" : ""}` 
+                                                  : isLayout3 
+                                                  ? `text-[160px] ${isDescender ? "pb-9" : ""}` 
+                                                  : `text-[115px] ${isDescender ? "pb-6" : ""}`
+                                              }`}>
+                                                {consonant.character}
+                                              </span>
+                                              <div className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full text-white bg-slate-900 shadow-4xs ${isDescender ? "mt-2" : "mt-1"}`}>
+                                                {consonant.pronunciation.split('-')[0]}
+                                              </div>
+                                            </>
+                                          );
+                                        })()}
                                       </div>
                                     </div>
                                   </div>
 
-                                  {/* Right: Adorable cartoon animal badge */}
-                                  <div className="flex flex-col items-center">
+                                  {/* Right: Adorable cartoon animal badge (40% weight) */}
+                                  <div className={`flex flex-col items-center ${!isLayout4 ? "flex-[2_2_0%] w-[40%]" : ""}`}>
                                     <div className={`relative flex items-center justify-center transition hover:scale-105 ${
-                                      isLayout2 ? "w-28 h-28 text-6xl" : isLayout3 ? "w-22 h-22 text-5xl" : "w-18 h-18 text-4xl"
+                                      isLayout2 ? "w-56 h-56 text-8xl" : isLayout3 ? "w-44 h-44 text-7xl" : "w-32 h-32 text-6xl"
                                     }`}>
                                       <div className="filter drop-shadow-md">
                                         {renderCuteIllustration(
                                           consonant.emoji,
-                                          isLayout2 ? "w-28 h-28 animate-pulse" : isLayout3 ? "w-22 h-22 animate-pulse" : "w-18 h-18 animate-pulse",
+                                          isLayout2 ? "w-52 h-52 animate-pulse" : isLayout3 ? "w-40 h-40 animate-pulse" : "w-28 h-28 animate-pulse",
                                           consonant.name
                                         )}
                                       </div>
@@ -1250,16 +1411,28 @@ export default function App() {
                         selectedLayout === "4" ? "flex-col justify-between p-3" : "flex-row items-center justify-between"
                       }`}
                     >
-                      <div className={`flex items-center gap-4 ${selectedLayout === "4" ? "w-full justify-between" : ""}`}>
+                      {/* Left/Upper info area containing main characters (60% weight) */}
+                      <div className={`flex items-center gap-4 ${selectedLayout === "4" ? "w-full justify-between" : "flex-[3_3_0%] w-[60%]"}`}>
                         <div className="flex flex-col items-center">
-                          <span className={`${activeFontClass} font-bold text-slate-900 leading-none ${
-                            selectedLayout === "2" ? "text-[180px] mb-2" : selectedLayout === "3" ? "text-[135px] mb-1" : "text-[105px]"
-                          }`}>
-                            {consonant.character}
-                          </span>
-                          <span className="bg-slate-900 text-white text-[11px] px-2.5 py-0.5 rounded-full font-bold">
-                            {consonant.pronunciation}
-                          </span>
+                          {(() => {
+                            const isDescender = ["ญ", "ฎ", "ฏ", "ฐ"].includes(consonant.character);
+                            return (
+                              <>
+                                <span className={`${activeFontClass} font-bold text-slate-900 leading-none ${
+                                  selectedLayout === "2" 
+                                    ? `text-[180px] ${isDescender ? "mb-11 pb-5" : "mb-2"}` 
+                                    : selectedLayout === "3" 
+                                    ? `text-[135px] ${isDescender ? "mb-7 pb-3" : "mb-1"}` 
+                                    : `text-[105px] ${isDescender ? "mb-5 pb-2" : ""}`
+                                }`}>
+                                  {consonant.character}
+                                </span>
+                                <span className={`bg-slate-900 text-white text-[11px] px-2.5 py-0.5 rounded-full font-bold ${isDescender ? "mt-1.5" : ""}`}>
+                                  {consonant.pronunciation}
+                                </span>
+                              </>
+                            );
+                          })()}
                         </div>
 
                         <div className={`w-0.5 h-16 border-l-2 border-dashed ${activeTheme.border} ${selectedLayout === "4" ? "hidden" : ""}`} />
@@ -1285,14 +1458,15 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className={`flex items-center gap-4 ${selectedLayout === "4" ? "w-full flex-col mt-2 pt-2 border-t border-dashed border-slate-200" : "flex-1 ml-6 justify-end"}`}>
+                      {/* Right illustration / Tracing Guide Area (40% weight) */}
+                      <div className={`flex items-center gap-4 ${selectedLayout === "4" ? "w-full flex-col mt-2 pt-2 border-t border-dashed border-slate-200" : "flex-[2_2_0%] w-[40%] ml-6 justify-end"}`}>
                         <div className={`flex flex-col items-center justify-center p-2 bg-slate-50 rounded-xl border border-dashed relative ${activeTheme.border} ${
-                          selectedLayout === "2" ? "w-28 h-28 text-6xl" : selectedLayout === "3" ? "w-22 h-22 text-5xl" : "hidden"
+                          selectedLayout === "2" ? "w-44 h-44 text-7xl" : selectedLayout === "3" ? "w-36 h-36 text-6xl" : "w-28 h-28 text-5xl"
                         }`}>
                           <div className="relative z-10 select-none">
                             {renderCuteIllustration(
                               consonant.emoji,
-                              selectedLayout === "2" ? "w-14 h-14" : "w-10 h-10",
+                              selectedLayout === "2" ? "w-36 h-36" : selectedLayout === "3" ? "w-28 h-28" : "w-20 h-20",
                               consonant.name
                             )}
                           </div>
@@ -1339,38 +1513,60 @@ export default function App() {
                         selectedLayout === "4" ? "flex-col justify-between p-3" : "flex-row items-center justify-between gap-6"
                       }`}
                     >
-                      <div className="flex flex-col items-center flex-1 justify-center relative">
+                      {/* Left Hollow letter for coloring (60% weight) */}
+                      <div className={`flex flex-col items-center justify-center relative ${
+                        selectedLayout === "4" ? "flex-1 w-full" : "flex-[3_3_0%] w-[60%]"
+                      }`}>
                         <span className="absolute -top-2 -left-2 text-xs font-bold text-slate-300 border border-slate-200 rounded px-1 uppercase bg-white">
                           Color Me!
                         </span>
-                        <span 
-                          className={`${activeFontClass} font-extrabold text-transparent leading-none z-10 ${
-                            selectedLayout === "2" ? "text-[210px]" : selectedLayout === "3" ? "text-[150px]" : "text-[120px]"
-                          }`}
-                          style={{ WebkitTextStroke: "3px #0f172a" }}
-                        >
-                          {consonant.character}
-                        </span>
-                        <span className="text-xs font-bold text-slate-500 mt-2">ระบายสี พยัญชนะ "{consonant.character}"</span>
+                        {(() => {
+                          const isDescender = ["ญ", "ฎ", "ฏ", "ฐ"].includes(consonant.character);
+                          return (
+                            <>
+                              <span 
+                                className={`${activeFontClass} font-extrabold text-transparent leading-none z-10 ${
+                                  selectedLayout === "2" 
+                                    ? `text-[210px] ${isDescender ? "pb-12" : ""}` 
+                                    : selectedLayout === "3" 
+                                    ? `text-[150px] ${isDescender ? "pb-9" : ""}` 
+                                    : `text-[120px] ${isDescender ? "pb-6" : ""}`
+                                }`}
+                                style={{ WebkitTextStroke: "3px #0f172a" }}
+                              >
+                                {consonant.character}
+                              </span>
+                              <span className={`text-xs font-bold text-slate-500 ${isDescender ? "mt-5" : "mt-2"}`}>ระบายสี พยัญชนะ "{consonant.character}"</span>
+                            </>
+                          );
+                        })()}
                       </div>
 
+                      {/* Middle divide line */}
                       <div className={`w-0.5 h-20 border-l-2 border-dotted ${activeTheme.border} ${selectedLayout === "4" ? "hidden" : ""}`} />
 
-                      <div className="flex-1 flex flex-col gap-2 justify-center h-full w-full">
+                      {/* Right blank creative drawing box based on representational objects (40% weight) */}
+                      <div className={`flex flex-col gap-2 justify-center h-full ${
+                        selectedLayout === "4" ? "flex-1 w-full" : "flex-[2_2_0%] w-[40%]"
+                      }`}>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                          <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                             <span>ระบายสี {consonant.name}</span>
-                            {renderCuteIllustration(consonant.emoji, "w-5 h-5", consonant.name)}
+                            {renderCuteIllustration(consonant.emoji, "w-8 h-8", consonant.name)}
                           </span>
                           <span className="text-[10px] text-slate-400">{consonant.fullname}</span>
                         </div>
                         
-                        <div className="border-2 border-dashed border-slate-300 rounded-xl flex-1 min-h-[70px] bg-slate-50 flex flex-col items-center justify-center p-3 text-center relative overflow-hidden">
-                          <div className="opacity-15">
-                            {renderCuteIllustration(consonant.emoji, "w-14 h-14", consonant.name)}
+                        <div className="border-2 border-dashed border-slate-300 rounded-xl flex-1 min-h-[130px] bg-slate-50 flex flex-col items-center justify-center p-3 text-center relative overflow-hidden">
+                          <div className="opacity-20">
+                            {renderCuteIllustration(
+                              consonant.emoji,
+                              selectedLayout === "2" ? "w-44 h-44" : selectedLayout === "3" ? "w-36 h-36" : "w-28 h-28",
+                              consonant.name
+                            )}
                           </div>
-                          <span className="text-[9px] text-slate-400 font-bold mt-1 block">
-                            ฝึกวาดรูปหรือระบายสี '{consonant.name}' ตรงนี้ 🎨
+                          <span className="text-[10px] text-slate-400 font-bold mt-2 block">
+                            ระบายสีหรือหัดวาด '{consonant.name}' ตรงนี้ 🎨
                           </span>
                         </div>
                       </div>
@@ -1424,39 +1620,46 @@ export default function App() {
                           isLayout4 ? "flex-col justify-center text-center gap-1.5" : "flex-row justify-around"
                         }`}>
                           
-                          {/* Left: Giant playful consonant box */}
-                          <div className="flex flex-col items-center justify-center">
+                          {/* Left: Giant playful consonant box (60% weight) */}
+                          <div className={`flex flex-col items-center justify-center ${!isLayout4 ? "flex-[3_3_0%] w-[60%]" : ""}`}>
                             <div className="relative group">
                               {/* Playful drop background bubble */}
                               <div className={`absolute -inset-1.5 bg-${themeColor === 'mono' ? 'slate-100' : themeColor + '-100'} bg-opacity-70 rounded-2xl opacity-75 blur-xs transition-all duration-300 group-hover:opacity-100`} />
                               <div className={`relative bg-white border border-slate-200/80 shadow-2xs rounded-2xl px-5 py-2 flex flex-col items-center justify-center ${
                                 isLayout2 ? "min-w-[195px] px-6 py-3" : isLayout3 ? "min-w-[155px]" : "min-w-[115px]"
                               }`}>
-                                <span className={`${activeFontClass} font-black tracking-tight leading-none text-slate-900 ${
-                                  isLayout2 
-                                    ? "text-[210px]" 
-                                    : isLayout3
-                                    ? "text-[160px]" 
-                                    : "text-[115px]"
-                                }`}>
-                                  {consonant.character}
-                                </span>
-                                <div className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full text-white bg-slate-900 shadow-4xs mt-1">
-                                  {consonant.pronunciation.split('-')[0]}
-                                </div>
+                                {(() => {
+                                  const isDescender = ["ญ", "ฎ", "ฏ", "ฐ"].includes(consonant.character);
+                                  return (
+                                    <>
+                                      <span className={`${activeFontClass} font-black tracking-tight leading-none text-slate-900 ${
+                                        isLayout2 
+                                          ? `text-[210px] ${isDescender ? "pb-12" : ""}` 
+                                          : isLayout3 
+                                          ? `text-[160px] ${isDescender ? "pb-9" : ""}` 
+                                          : `text-[115px] ${isDescender ? "pb-6" : ""}`
+                                      }`}>
+                                        {consonant.character}
+                                      </span>
+                                      <div className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full text-white bg-slate-900 shadow-4xs ${isDescender ? "mt-2" : "mt-1"}`}>
+                                        {consonant.pronunciation.split('-')[0]}
+                                      </div>
+                                    </>
+                                  );
+                                })()}
                               </div>
                             </div>
                           </div>
 
-                          {/* Right: Adorable cartoon animal badge */}
-                          <div className="flex flex-col items-center">
+                          {/* Right: Adorable cartoon animal badge (40% weight) */}
+                          <div className={`flex flex-col items-center ${!isLayout4 ? "flex-[2_2_0%] w-[40%]" : ""}`}>
                             <div className={`relative flex items-center justify-center transition hover:scale-105 ${
-                              isLayout2 ? "w-28 h-28 text-6xl" : isLayout3 ? "w-22 h-22 text-5xl" : "w-18 h-18 text-4xl"
+                              isLayout2 ? "w-56 h-56 text-8xl" : isLayout3 ? "w-44 h-44 text-7xl" : "w-32 h-32 text-6xl"
                             }`}>
                               <div className="filter drop-shadow-md">
                                 {renderCuteIllustration(
                                   consonant.emoji,
-                                  isLayout2 ? "w-28 h-28" : isLayout3 ? "w-22 h-22" : "w-18 h-18",
+                                  isLayout2 ? "w-52 h-52" : isLayout3 ? "w-40 h-40" : "w-28 h-28",
                                   consonant.name
                                 )}
                               </div>
